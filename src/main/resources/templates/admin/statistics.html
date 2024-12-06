@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body class="container mt-5">
+    <h1 class="text-center mb-4">Task Statistics</h1>
+    <div class="d-flex justify-content-around mb-4">
+      <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+        <div class="card-header">Total Users</div>
+        <div class="card-body">
+          <h5 class="card-title" id="totalUsers">0</h5>
+        </div>
+      </div>
+      <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
+        <div class="card-header">Total Tasks</div>
+        <div class="card-body">
+          <h5 class="card-title" id="totalTasks">0</h5>
+        </div>
+      </div>
+      <div class="card text-white bg-warning mb-3" style="max-width: 18rem;">
+        <div class="card-header">Pending Tasks</div>
+        <div class="card-body">
+          <h5 class="card-title" id="pendingTasks">0</h5>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-around mb-4">
+      <div class="w-50 p-2">
+        <h3 class="text-center">Task Status Distribution</h3>
+        <canvas id="taskStatusChart"></canvas>
+      </div>
+      <div class="w-50 p-2">
+        <h3 class="text-center">Task Count by User</h3>
+        <canvas id="taskCountByUserChart"></canvas>
+      </div>
+    </div>
+    <script>
+      async function fetchData() {
+        const response = await fetch('/api/statistics');
+        const data = await response.json();
+        return data;
+      }
+
+      function renderCharts(data) {
+        const { completedTasks, inProgressTasks, taskCountByUser, totalUsers, totalTasks, pendingTasks } = data;
+
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('totalTasks').textContent = totalTasks;
+        document.getElementById('pendingTasks').textContent = pendingTasks;
+
+        const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
+        new Chart(taskStatusCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Completed', 'In Progress'],
+            datasets: [{
+              data: [completedTasks, inProgressTasks],
+              backgroundColor: ['#4caf50', '#ff9800']
+            }]
+          }
+        });
+
+        const taskCountByUserCtx = document.getElementById('taskCountByUserChart').getContext('2d');
+        new Chart(taskCountByUserCtx, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(taskCountByUser),
+            datasets: [{
+              label: 'Tasks Owned',
+              data: Object.values(taskCountByUser),
+              backgroundColor: '#2196f3'
+            }]
+          }
+        });
+      }
+
+      fetchData().then(renderCharts);
+    </script>
+  </body>
+</html>

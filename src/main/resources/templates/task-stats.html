@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Task Statistics</h1>
+    <div>
+        <canvas id="taskStatusChart"></canvas>
+    </div>
+    <div>
+        <canvas id="taskByDateChart"></canvas>
+    </div>
+
+    <script>
+        const taskStatusCount = /*[[${taskStatusCount}]]*/ {};
+        const taskByDateCount = /*[[${taskByDateCount}]]*/ {};
+
+        const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
+        new Chart(taskStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(taskStatusCount),
+                datasets: [{
+                    data: Object.values(taskStatusCount),
+                    backgroundColor: ['#36a2eb', '#ff6384']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Task Status Distribution'
+                    }
+                }
+            }
+        });
+
+        const taskByDateCtx = document.getElementById('taskByDateChart').getContext('2d');
+        new Chart(taskByDateCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(taskByDateCount),
+                datasets: [{
+                    label: 'Tasks',
+                    data: Object.values(taskByDateCount),
+                    backgroundColor: '#36a2eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Tasks by Date'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
